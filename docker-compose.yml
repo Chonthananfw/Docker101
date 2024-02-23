@@ -1,0 +1,56 @@
+version: '3.5'
+services:
+  nginx01:
+    image: chonthanan/nginx
+    #container_name: my_nginx
+    ports:
+      - 3000:80
+    depends_on:
+      - json_server
+
+  json_server:
+    image: my_json_images:1.0.0
+    #container_name: my_json_server
+    build: 
+      context: ./json-server
+      dockerfile: ./Dockerfile
+    ports:
+      - 3001:3000
+
+  mb:
+    image: my_mb_images:1.0.0
+    #container_name: my_mb_server
+    build: 
+      context: ./mb
+      dockerfile: ./Dockerfile
+    ports:
+      - 3002:2525
+      - 8000:8000
+    command: --configfile ./imposters/imposters.ejs --allowInjection
+
+  postgres:
+    image: postgres:13.7
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5433:5432
+
+  newman:
+    image: my_newman_images:1.0.0
+
+    build: 
+      context: ./newman
+      dockerfile: ./Dockerfile
+
+    command: |
+      run docker_workshop.postman_collection.json 
+      -e docker_workshop.postman_environment.json 
+      -r cli,htmlextra --reporter-htmlextra-export reports/report.html 
+      --env-var "host=host.docker.internal:8000"
+
+    depends_on:
+      - mb
+
+    volumes:
+      - ./newman/reports:/newman/reports

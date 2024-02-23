@@ -1,0 +1,36 @@
+{
+    "port": 8000,
+    "protocol": "http",
+    "stubs": [
+        {
+            "predicates": [
+                {
+                    "equals": {
+                        "method": "GET"
+                    }
+                },
+                {
+                    "equals": {
+                        "path": "/rates/usd/"
+                    }
+                }               
+            ],
+            "responses": [
+                {
+                    "is": {
+                        "statusCode": 200,
+                        "headers": {
+                            "Content-Types": "application/json"
+                        },
+                        "body": [
+                            {
+                                "denom": "100",
+                                "sell": 35
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
